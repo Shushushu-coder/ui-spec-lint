@@ -1,0 +1,40 @@
+{
+  "name": "ui-spec-lint",
+  "version": "0.1.0",
+  "description": "Design-system contract linter: tokens, component reuse, interaction states and motion budget — CLI engine plus an agent skill layer",
+  "keywords": [
+    "design-system",
+    "design-tokens",
+    "lint",
+    "ui",
+    "ux",
+    "tailwind",
+    "accessibility"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "ui-spec-lint": "dist/cli.js"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "SKILL.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "prepublishOnly": "pnpm build"
+  },
+  "dependencies": {
+    "typescript": "6.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.0"
+  }
+}
