@@ -6,7 +6,6 @@ import {
   hasSpreadAttr,
   importDecls,
   jsxElements,
-  lineOf,
   openingOf,
   posOf,
   tagName,
@@ -397,9 +396,8 @@ export const rules: Rule[] = [
     run(doc) {
       const findings: Finding[] = [];
       if (!doc.sf) return findings;
-      for (const node of walkNodes(doc.sf)) {
-        if (!ts.isJsxElement(node) && !ts.isJsxSelfClosingElement(node)) continue;
-        const open = ts.isJsxElement(node) ? node.openingElement : node;
+      for (const node of jsxElements(doc)) {
+        const open = openingOf(node);
         if (tagName(open) !== "button") continue;
         const attrs = attrNames(open);
         if ([...NAME_ATTRS].some((a) => attrs.has(a))) continue;

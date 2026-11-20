@@ -7,6 +7,8 @@ export interface SourceDoc {
   text: string;
   isCss: boolean;
   sf?: ts.SourceFile;
+  _classStrings?: ClassString[];
+  _jsxElements?: Array<ts.JsxSelfClosingElement | ts.JsxElement>;
 }
 
 const CODE_EXT = new Set([".ts", ".tsx", ".mts", ".cts", ".js", ".jsx"]);
@@ -68,17 +70,6 @@ export function posOf(
   return { line: p.line + 1, col: p.character + 1 };
 }
 
-export function lineOf(text: string, index: number): { line: number; col: number } {
-  let line = 1;
-  let last = 0;
-  for (let i = 0; i < index && i < text.length; i++) {
-    if (text.charCodeAt(i) === 10) {
-      line += 1;
-      last = i + 1;
-    }
-  }
-  return { line, col: index - last + 1 };
-}
 
 const CLASS_ATTRS = new Set(["className", "class", "tw"]);
 const CLASS_FNS = new Set([
@@ -107,7 +98,8 @@ function literalText(expr: ts.Expression): string | null {
 
 /** class-ish strings: className/class/tw attribute values + args of clsx/cn/cva/twMerge. */
 export function classStrings(doc: SourceDoc): ClassString[] {
-  if (!doc.sf) return [];
+  if (doc._classStrings) return doc._classStrings;
+  if (!doc.sf) return (doc._classStrings = []);
   const out: ClassString[] = [];
   const push = (text: string | null, pos: number): void => {
     if (text === null) return;
@@ -132,18 +124,17 @@ export function classStrings(doc: SourceDoc): ClassString[] {
       }
     }
   }
-  return out;
+  return (doc._classStrings = out);
 }
 
-export function* jsxElements(
-  doc: SourceDoc,
-): Iterable<ts.JsxSelfClosingElement | ts.JsxElement> {
-  if (!doc.sf) return;
+export function jsxElements(doc: SourceDoc): Array<ts.JsxSelfClosingElement | ts.JsxElement> {
+  if (doc._jsxElements) return doc._jsxElements;
+  if (!doc.sf) return (doc._jsxElements = []);
+  const out: Array<ts.JsxSelfClosingElement | ts.JsxElement> = [];
   for (const node of walkNodes(doc.sf)) {
-    if (ts.isJsxSelfClosingElement(node) || ts.isJsxElement(node)) {
-      yield node;
-    }
+    if (ts.isJsxSelfClosingElement(node) || ts.isJsxElement(node)) out.push(node);
   }
+  return (doc._jsxElements = out);
 }
 
 export function openingOf(

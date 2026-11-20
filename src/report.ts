@@ -2,7 +2,6 @@ import type { Severity } from "./config.js";
 import type { Finding } from "./rules.js";
 
 const ORDER: Record<Severity, number> = { error: 0, warn: 1, info: 2 };
-const RANK: Record<Severity, number> = { error: 3, warn: 2, info: 1 };
 
 export function sortFindings(findings: Finding[]): Finding[] {
   return [...findings].sort((a, b) =>
@@ -56,5 +55,5 @@ export type FailOn = Severity | "never";
 
 export function shouldFail(findings: Finding[], failOn: FailOn): boolean {
   if (failOn === "never") return false;
-  return findings.some((f) => RANK[f.severity] >= RANK[failOn]);
+  return findings.some((f) => ORDER[f.severity] <= ORDER[failOn]);
 }
